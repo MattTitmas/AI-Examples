@@ -3,7 +3,7 @@ class NeuralNetwork {
   int InputNodes;
   int HiddenLayerOne;
   int HiddenLayerTwo;
-  int OutputNodes;
+  int OutputNodes; /* Fixed number of layers - decided by programmer */
 
   Matrix Weights1;
   Matrix Weights2;
@@ -13,7 +13,7 @@ class NeuralNetwork {
   Matrix HiddenTwoBias;
   Matrix OutputBias;
 
-  NeuralNetwork(int Input, int HiddenOne, int HiddenTwo, int Output) {
+  NeuralNetwork(int Input, int HiddenOne, int HiddenTwo, int Output) { /* Initialiser, each input is the number of nodes in each layer */
     InputNodes = Input;
     HiddenLayerOne = HiddenOne;
     HiddenLayerTwo = HiddenTwo;
@@ -26,7 +26,7 @@ class NeuralNetwork {
     OutputBias = new Matrix(1, OutputNodes, true);
   }
 
-  Matrix ForwardPropogation(Matrix Input) {
+  Matrix ForwardPropogation(Matrix Input) { /* Propogates an input forward to reach an output */
     Matrix DotProduct1 = Matrix.Dot(Input, Weights1);
     DotProduct1.AddMatrix(HiddenOneBias);
     DotProduct1.Sigmoid();
