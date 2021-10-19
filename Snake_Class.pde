@@ -1,15 +1,15 @@
 class Snake {
   boolean[][] Board;
-  ArrayList<PVector> TailPositions;
-  PVector FoodPos;
+  ArrayList<PVector> TailPositions; /* List of positions of the snake that aren't the head
+  PVector FoodPos; /* Position of the food */
   int HeadPosX;
   int HeadPosY;
-  int Length;
-  int Spacing;
-  boolean Dead;
+  int Length; /* Used for fitness */
+  int Spacing; /* Spacing of each square on the board */
+  boolean Dead; /* Is the snake dead or not */
 
-  int TimeAlive;
-  NeuralNetwork Brain;
+  int TimeAlive; /* Used for fitness */
+  NeuralNetwork Brain; /* Brain of the snake */
 
   Snake() {
     Reset();
@@ -17,7 +17,7 @@ class Snake {
     Brain = new NeuralNetwork(8, 128, 64, 4);
   }
 
-  void Show() {
+  void Show() { /* Shows the snake on the board */
 
     for (PVector Position : TailPositions) {
       fill(255);
@@ -28,16 +28,16 @@ class Snake {
     rect(FoodPos.x*Spacing, FoodPos.y*Spacing, Spacing, Spacing);
   }
 
-  void Move() {
+  void Move() { /* Calculate next position of the snake */
     TimeAlive++;
     
-    if (TimeAlive > 250) {
+    if (TimeAlive > 250) { /* Kill the snake if it hasnt eaten in a long time - stops snake going in circles */
       Dead = true;
     }
     
     TailPositions.add(new PVector(HeadPosX, HeadPosY));
 
-    int[] Inputs = new int[8];
+    int[] Inputs = new int[8]; /* Set inputs for the neural networks */
     if (HeadPosX - 1 < 0) {
       Inputs[0] = 0;
     } else {
@@ -105,7 +105,7 @@ class Snake {
     Matrix Input = Matrix.Array(Inputs);
     Matrix Result = Brain.ForwardPropogation(Input);
     int Direction = Result.ShowMax();
-    if (Direction == 0) {
+    if (Direction == 0) { /* Move the snake, dependent on result */
       HeadPosY++;
     } else if (Direction == 1) {
       HeadPosX++;
@@ -120,7 +120,7 @@ class Snake {
       Grow = true;
       Length++;
       GenerateFood();
-      TimeAlive = 0;
+      TimeAlive = 0; /* Eaten, reset timeAlive */
     }
 
     if (HeadPosX >= Rows || HeadPosY >= Rows || HeadPosX < 0 || HeadPosY < 0) {
@@ -139,11 +139,11 @@ class Snake {
   }
 
 
-  int GetFitness() {
-    return (Length*1000 + TimeAlive);
+  int GetFitness() { /* Returns the fitness of the snake, length is prioritised over TimeAlive */
+    return (Length*1000 + TimeAlive); /* max(TimeAlive) = 250 */
   }
 
-  void Mutate(Snake ToMutate) {
+  void Mutate(Snake ToMutate) { /* Mutate each matrix within the snakes brain TODO - add function into Neural Network class that does this secretly */
     Brain.Weights1 = Matrix.Mutate(ToMutate.Brain.Weights1);
     Brain.Weights2 = Matrix.Mutate(ToMutate.Brain.Weights2);
     Brain.Weights3 = Matrix.Mutate(ToMutate.Brain.Weights3);
@@ -155,7 +155,7 @@ class Snake {
     Reset();
   }
 
-  void GenerateFood() {
+  void GenerateFood() { /* Finds new food position */
     for (;; ) {
       FoodPos = new PVector(floor(random(Rows)), floor(random(Rows)));
       if (!Board[floor(FoodPos.x)][floor(FoodPos.y)]) {
@@ -164,7 +164,7 @@ class Snake {
     }
   }
 
-  void Reset() {
+  void Reset() { /* Resets board */
     Board = new boolean[Rows][Rows];
     Spacing = width/Rows;
     HeadPosX = floor(Rows/2);
